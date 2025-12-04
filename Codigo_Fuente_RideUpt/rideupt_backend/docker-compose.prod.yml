@@ -1,0 +1,98 @@
+# ============================================
+# DOCKER COMPOSE - PRODUCCIÓN CON MONGODB ATLAS
+# ============================================
+# Configuración optimizada para Docker + MongoDB Atlas
+# Sin problemas de desconexión
+# ============================================
+
+version: '3.8'
+
+services:
+  # API Backend - RideUpt
+  api:
+    container_name: rideupt-api-prod
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    ports:
+      - "3000:3000"
+    environment:
+      # MongoDB Atlas (desde .env)
+      - MONGO_URI=${MONGO_URI:-mongodb://localhost:27017/rideupt}
+      - JWT_SECRET=${JWT_SECRET:-default_jwt_secret_change_in_production}
+      - PORT=3000
+      - NODE_ENV=production
+      # Directorio de almacenamiento (fuera de Docker)
+      - STORAGE_BASE_DIR=/var/rideupt/storage
+      # URL del servidor para generar URLs absolutas de imágenes
+      - SERVER_URL=https://rideupt.sytes.net
+      # Variables para debugging (opcional)
+      - DEBUG=${DEBUG:-false}
+    volumes:
+      # Montar archivo de credenciales de Firebase (solo lectura)
+      - ./config/firebase-service-account.json:/usr/src/app/config/firebase-service-account.json:ro
+      # ============================================
+      # ALMACENAMIENTO EXTERNO - IMÁGENES DE CONDUCTORES
+      # ============================================
+      # Montar el directorio de almacenamiento desde el servidor host
+      # Esto permite que las imágenes persistan fuera del contenedor Docker
+      - /var/rideupt/storage:/var/rideupt/storage
+    
+    # Política de reinicio: siempre reiniciar si se cae
+    restart: always
+    
+    # Red personalizada
+    networks:
+      - rideupt-network
+    
+    # Health check robusto
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/health"]
+      interval: 30s        # Verificar cada 30 segundos
+      timeout: 10s         # 10 segundos de timeout
+      retries: 5           # 5 intentos antes de marcar como unhealthy
+      start_period: 60s    # Esperar 60s antes de empezar health checks
+    
+    # Límites de recursos (ajusta según tu servidor)
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'      # Máximo 1 CPU
+          memory: 512M     # Máximo 512 MB RAM
+        reservations:
+          cpus: '0.5'      # Mínimo 0.5 CPU
+          memory: 256M     # Mínimo 256 MB RAM
+    
+    # Logging optimizado
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"    # Máximo 10 MB por archivo de log
+        max-file: "5"      # Mantener 5 archivos (50 MB total)
+        compress: "true"   # Comprimir logs antiguos
+    
+    # DNS para mejor resolución de MongoDB Atlas
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+
+networks:
+  rideupt-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+# ============================================
+# COMANDOS ÚTILES:
+# ============================================
+# Iniciar:          docker compose -f docker-compose.prod.yml up -d
+# Ver logs:         docker compose -f docker-compose.prod.yml logs -f api
+# Ver estado:       docker compose -f docker-compose.prod.yml ps
+# Reiniciar:        docker compose -f docker-compose.prod.yml restart api
+# Detener:          docker compose -f docker-compose.prod.yml down
+# Reconstruir:      docker compose -f docker-compose.prod.yml up -d --build
+# Ver recursos:     docker stats rideupt-api-prod
+# Health check:     docker inspect rideupt-api-prod | grep -A 10 Health
+# ============================================
+
