@@ -1,0 +1,24 @@
+# Dockerfile.dev (CORREGIDO)
+
+# Partimos de la imagen oficial de Node.js para desarrollo.
+FROM node:18
+
+# Establecemos el directorio de trabajo dentro del contenedor.
+WORKDIR /usr/src/app
+
+# Copiamos los archivos de dependencias para poder instalarlas.
+COPY package*.json ./
+
+# ¡CORRECCIÓN AQUÍ!
+# Usamos 'npm install' para desarrollo. Este comando creará el package-lock.json
+# si no existe e instalará las devDependencies.
+RUN npm install
+
+# NO COPIAMOS EL RESTO DEL CÓDIGO AQUÍ.
+# Se va a sincronizar usando un "volumen" desde docker-compose.dev.yml.
+
+# Exponemos el puerto de la aplicación.
+EXPOSE 3000
+
+# El comando por defecto para iniciar nuestro servidor en modo desarrollo con recarga automática.
+CMD ["npm", "run", "dev"]
