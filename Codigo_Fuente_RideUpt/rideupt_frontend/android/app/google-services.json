@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "619194261837",
+    "project_id": "rideupt",
+    "storage_bucket": "rideupt.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:619194261837:android:787154bf320c82a4179704",
+        "android_client_info": {
+          "package_name": "com.example.rideupt_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "619194261837-kt6i1jtf8k0q06qvs03cgsvq34bfrarq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.rideupt_app",
+            "certificate_hash": "b4419e8b6dc8a641368f9888d04c43c5b2ca748f"
+          }
+        },
+        {
+          "client_id": "619194261837-14dk6ibochh231ejqhd563f9hqknimtj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA_eDO8W0qhWcvg0MRfA6qwmYdXvq9K6Dw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "619194261837-14dk6ibochh231ejqhd563f9hqknimtj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
