@@ -32,6 +32,9 @@
 [![Issues](https://img.shields.io/badge/Issue-%238-blue)](https://github.com/your-repo/issues/8)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Status](https://img.shields.io/badge/Status-Activo-success)]()
+[![Flutter](https://img.shields.io/badge/Flutter-3.7.2+-02569B?logo=flutter)](https://flutter.dev/)
+[![Node.js](https://img.shields.io/badge/Node.js-18+-339933?logo=node.js)](https://nodejs.org/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47A248?logo=mongodb)](https://www.mongodb.com/cloud/atlas)
 
 </div>
 
@@ -68,6 +71,8 @@ Los estudiantes universitarios enfrentan desafíos diarios para llegar al campus
 - **Falta de opciones** de movilidad asequibles
 - **Horarios limitados** de transporte público
 - **Inseguridad** en rutas de transporte público
+- **Falta de conexión** entre estudiantes que viajan por rutas similares
+- **Impacto ambiental** del uso excesivo de vehículos individuales
 
 ### Solución Propuesta
 
@@ -135,6 +140,8 @@ graph TB
     style F fill:#FF6F00,color:#fff
     style G fill:#4285F4,color:#fff
 ```
+
+> **Nota:** El sistema utiliza una arquitectura RESTful para comunicación asíncrona y WebSocket (Socket.io) para actualizaciones en tiempo real durante los viajes activos.
 
 ### Capas de la Arquitectura
 
@@ -321,6 +328,14 @@ erDiagram
 - Índice único en `email` de USER
 - Índice único SPARSE en `vehicle.licensePlate` de USER
 - Índices en campos de búsqueda frecuente (status, driver, rater, rated)
+
+### Validaciones y Constraints
+
+- **Email único**: Garantiza que cada usuario tenga un email único en el sistema
+- **Placa única**: Las placas de vehículos son únicas entre conductores
+- **Integridad referencial**: Las relaciones entre entidades se mantienen mediante ObjectId de MongoDB
+- **Validación de roles**: Solo usuarios con rol 'driver' pueden crear viajes
+- **Expiración automática**: Los viajes expiran automáticamente después de 6 minutos si no hay reservas
 
 ---
 
@@ -609,6 +624,28 @@ graph TB
 5. Sistema actualiza disponibilidad de asientos
 6. Pasajero recibe confirmación
 
+#### UC-004: Chat Durante Viaje
+**Actor**: Pasajero / Conductor  
+**Precondiciones**: Viaje en progreso  
+**Flujo Principal**:
+1. Usuario accede al chat del viaje
+2. Sistema establece conexión Socket.io
+3. Usuario envía mensaje
+4. Sistema notifica al otro participante
+5. Mensaje se almacena en historial
+6. Ambos usuarios ven mensajes en tiempo real
+
+#### UC-005: Calificar Después de Viaje
+**Actor**: Pasajero / Conductor  
+**Precondiciones**: Viaje completado, no calificado previamente  
+**Flujo Principal**:
+1. Usuario recibe notificación para calificar
+2. Usuario accede al formulario de calificación
+3. Usuario selecciona puntuación (1-5) y opcionalmente escribe comentario
+4. Sistema guarda calificación
+5. Sistema actualiza promedio del usuario calificado
+6. Usuario ve confirmación de calificación enviada
+
 ---
 
 ## 🔀 Estados del Sistema
@@ -779,6 +816,14 @@ flowchart LR
     style H fill:#EF4444,color:#fff
 ```
 
+### Estrategia de Despliegue Continuo
+
+El proyecto utiliza una estrategia de despliegue con:
+- **Zero-downtime**: Los contenedores se actualizan sin interrumpir el servicio
+- **Health checks**: Verificación automática del estado de los servicios
+- **Rollback automático**: Si el despliegue falla, se revierte automáticamente
+- **Backup automático**: Respaldo de base de datos antes de cada despliegue
+
 ### Configuración de Producción
 
 - **Servidor**: VPS Ubuntu con Docker
@@ -900,6 +945,7 @@ MONGO_URI=mongodb+srv://user:pass@cluster.mongodb.net/rideupt
 
 # JWT
 JWT_SECRET=your-secret-key-here
+JWT_EXPIRES_IN=7d
 
 # Servidor
 PORT=3000
@@ -912,7 +958,13 @@ FIREBASE_PROJECT_ID=your-project-id
 
 # Google Maps
 GOOGLE_MAPS_API_KEY=your-google-maps-api-key
+
+# Almacenamiento
+STORAGE_BASE_DIR=./uploads
+MAX_FILE_SIZE=5242880
 ```
+
+> **⚠️ Importante**: Nunca commitees el archivo `.env` al repositorio. Usa `.env.example` como plantilla.
 
 ### Docker (Producción)
 
@@ -1007,6 +1059,47 @@ proyecto-si889-2025-ii-u3-rideupt_briceno_cuadros_lopez/
 
 ---
 
+## 🧪 Testing
+
+### Backend
+
+```bash
+# Ejecutar tests (si están implementados)
+npm test
+
+# Verificar estado del servidor
+node check_server.js
+
+# Probar endpoints
+node test_server.js
+```
+
+### Frontend
+
+```bash
+# Ejecutar tests unitarios
+flutter test
+
+# Ejecutar tests de integración
+flutter test integration_test/
+
+# Analizar código
+flutter analyze
+```
+
+### Pruebas Manuales
+
+- ✅ Registro de usuarios
+- ✅ Autenticación con Google
+- ✅ Creación y búsqueda de viajes
+- ✅ Reserva de viajes
+- ✅ Chat en tiempo real
+- ✅ Sistema de calificaciones
+- ✅ Notificaciones push
+- ✅ Panel de administración
+
+---
+
 ## 📚 Documentación Adicional
 
 - [Informe de Factibilidad](./FD01-Informe-Factibilidad.md)
@@ -1034,6 +1127,35 @@ Este es un proyecto académico desarrollado para el curso de Patrones de Softwar
 
 Este proyecto es parte de un trabajo académico y está sujeto a los términos de uso de la Universidad Privada de Tacna.
 
+## 🙏 Agradecimientos
+
+- A la **Universidad Privada de Tacna** por brindar las herramientas y el espacio para desarrollar este proyecto
+- Al **Mag. Ing. Patrick Cuadros Quiroga** por su guía y apoyo durante el desarrollo
+- A la comunidad de **Flutter** y **Node.js** por las excelentes herramientas y documentación
+- A todos los estudiantes que contribuyeron con feedback durante las pruebas
+
+## 🔮 Futuras Mejoras
+
+- [ ] Integración con sistemas de pago
+- [ ] Implementación de rutas optimizadas
+- [ ] Sistema de reputación más robusto
+- [ ] Modo offline con sincronización
+- [ ] Análisis predictivo de demanda
+- [ ] Integración con redes sociales
+- [ ] Aplicación web responsive completa
+- [ ] Soporte multiidioma
+
+---
+
+## 📊 Estadísticas del Proyecto
+
+- **Líneas de código**: ~15,000+ (Frontend + Backend)
+- **Tecnologías utilizadas**: 20+
+- **Plataformas soportadas**: iOS, Android, Web
+- **Modelos de datos**: 3 principales
+- **Endpoints API**: 30+
+- **Pantallas de la app**: 25+
+
 ---
 
 ## 📞 Contacto
@@ -1043,6 +1165,21 @@ Para más información sobre el proyecto, contactar a los integrantes del equipo
 - **Docente**: Mag. Ing. Patrick Cuadros Quiroga
 - **Curso**: Patrones de Software
 - **Universidad**: Universidad Privada de Tacna
+- **Email del Proyecto**: rideupt.upt@gmail.com
+
+## 🐛 Reportar Problemas
+
+Si encuentras algún problema o tienes sugerencias, por favor:
+1. Abre un [Issue](https://github.com/your-repo/issues) en el repositorio
+2. Describe el problema detalladamente
+3. Incluye pasos para reproducir el error
+4. Adjunta capturas de pantalla si es relevante
+
+## 🔄 Versionado
+
+Este proyecto utiliza [Semantic Versioning](https://semver.org/) para el versionado:
+- **v1.0.0** - Versión inicial con funcionalidades básicas
+- Versiones futuras seguirán el formato: `MAJOR.MINOR.PATCH`
 
 ---
 
