@@ -59,6 +59,8 @@
 
 RideUPT es una plataforma de carpooling universitario diseñada para conectar estudiantes de la Universidad Privada de Tacna (UPT) que necesitan viajar desde y hacia el campus. La aplicación facilita el compartir vehículos entre estudiantes, promoviendo la movilidad sostenible, la reducción de costos de transporte y el fortalecimiento de la comunidad universitaria.
 
+RideUPT es una plataforma de carpooling universitario diseñada para conectar estudiantes de la Universidad Privada de Tacna (UPT) que necesitan viajar desde y hacia el campus. La aplicación facilita el compartir vehículos entre estudiantes, promoviendo la movilidad sostenible, la reducción de costos de transporte y el fortalecimiento de la comunidad universitaria.
+
 ### Problema que Resuelve
 
 Los estudiantes universitarios enfrentan desafíos diarios para llegar al campus:
